@@ -1,11 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import login
-
-def home_view(request):
-    return render(request, "main/homepage.html")
-
-
 import os
 
 from django.http import HttpResponse
