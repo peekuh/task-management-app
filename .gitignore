@@ -1,0 +1,6 @@
+taskmgmtenv
+.env
+migrations
+/_pycache_
+*.pyc
+.pyc
