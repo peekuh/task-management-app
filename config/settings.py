@@ -29,6 +29,9 @@ SECRET_KEY = 'django-insecure-r@%kigis^(nr5j!6&5(!zhurkcldzwk!qaha!zce*x+71g-81$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
+
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
@@ -138,3 +141,4 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
