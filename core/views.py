@@ -11,6 +11,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from .models import Tasks
+import json
 
 @method_decorator(csrf_exempt, name= 'dispatch')
 class GoogleLogin(View):
@@ -33,8 +35,7 @@ class GoogleLogin(View):
         Google calls this URL after the  user has signed in with their Google account.
         """
         print('Inside')
-        token =  request.POST.get('credential') or request.GET.get('credential')
-
+        token = request.POST.get('credential')
         try:
             user_data = id_token.verify_oauth2_token(
                 token, requests.Request(), getattr(settings, "GOOGLE_OAUTH_CLIENT_ID")
@@ -54,10 +55,38 @@ class GoogleLogin(View):
             user.save()
         request.session['user_data'] = user_data
         login(request, user)
-        print(user_data)
+        print("print userdata", user_data)
         url =  url = reverse('sign_in', kwargs={'event': 'login'})
         return HttpResponseRedirect(url)
 
     def sign_out(self, request):
         del request.session['user_data']
         return redirect('sign_in', event = "login")
+
+@method_decorator(csrf_exempt, name= 'dispatch')
+class TaskManagement(View):
+    def get(self, request):
+        return render(request, 'main/tasks.html')
+    
+    def post(self, request):
+        if request.POST["event"] == "task.create":
+            title = request.POST['title']
+            description = request.POST['description']
+            Tasks.objects.create(
+                user = request.user,
+                title = title,
+                description = description
+            )
+            return HttpResponse("task created")
+        
+        elif request.POST["event"] == "task.edit":
+            Tasks.objects.filter(id = request.POST["chat_id"]).update(title = request.POST["task_title"])
+            return HttpResponse("task updated")
+
+        elif request.POST["event"] == "task.delete":
+            Tasks.objects.get(id = request.POST["chat_id"]).delete()
+            return HttpResponse("task deleted")
+
+
+        
+
