@@ -63,17 +63,29 @@ class GoogleLogin(View):
         del request.session['user_data']
         return redirect('sign_in', event = "login")
 
-@method_decorator(csrf_exempt, name= 'dispatch')
+
+
+class TaskView(View):
+    def get(self, request):
+        tasks = Tasks.objects.filter(user_id = request.user.id)
+        for task in tasks:
+            print(task)
+        return
+
 class TaskManagement(View):
     def get(self, request):
-        return render(request, 'main/tasks.html')
+        tasks = Tasks.objects.filter(user_id = request.user.id)
+        for task in tasks:
+            print(task)
+        return render(request, 'main/tasks.html', context = { 'tasks': tasks })
     
     def post(self, request):
         if request.POST["event"] == "task.create":
             title = request.POST['title']
             description = request.POST['description']
+            print(request.user.pk)
             Tasks.objects.create(
-                user = request.user,
+                user_id = request.user.id,
                 title = title,
                 description = description
             )

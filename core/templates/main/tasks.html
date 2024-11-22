@@ -17,26 +17,41 @@
         <button type="submit">Create Task</button>
     </form>
 
+    <h1>Your Tasks</h1>
+    
+    <!-- Loop through the tasks and display each one -->
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <strong>{{ task.title }}</strong>: {{ task.description }}
+            </li>
+        {% empty %}
+            <p>No tasks found.</p>
+        {% endfor %}
+    </ul>
+
     <script>
         document.getElementById('taskForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent form submission
-
+            event.preventDefault(); // Prevent default form submission behavior
+    
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
-            const formData = new FormData(); // Create URL-encoded data
+    
+            const formData = new URLSearchParams(); // Create URL-encoded data
             formData.append('event', 'task.create'); // Include the event type
             formData.append('title', title);
             formData.append('description', description);
+    
             try {
-                const response = await fetch('', {
+                const response = await fetch('/task/', {
                     method: 'POST',
                     headers: {
-                        // 'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': '{{ csrf_token }}' // If CSRF protection is enabled
+                        'Content-Type': 'application/x-www-form-urlencoded', // Use form-urlencoded format
+                        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for Django
                     },
-                    body: formData
+                    body: formData.toString() // Send URL-encoded data
                 });
-
+    
                 if (response.ok) {
                     alert('Task created successfully!');
                 } else {
@@ -48,5 +63,6 @@
             }
         });
     </script>
+    
 </body>
 </html>
