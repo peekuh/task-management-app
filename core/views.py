@@ -63,22 +63,15 @@ class GoogleLogin(View):
         del request.session['user_data']
         return redirect('sign_in', event = "login")
 
-
-
-class TaskView(View):
-    def get(self, request):
-        tasks = Tasks.objects.filter(user_id = request.user.id)
-        for task in tasks:
-            print(task)
-        return
-
 class TaskManagement(View):
     def get(self, request):
-        tasks = Tasks.objects.filter(user_id = request.user.id)
-        for task in tasks:
-            print(task)
-        return render(request, 'main/tasks.html', context = { 'tasks': tasks })
-    
+        if request.GET['event'] == "tasks.view":
+            tasks = Tasks.objects.filter(user_id = request.user.id)
+            return render(request, 'main/tasks-view.html', context = { 'tasks': tasks })
+        
+        elif request.GET['event'] == "tasks.create":
+            return render(request, 'main/tasks-create.html')
+
     def post(self, request):
         if request.POST["event"] == "task.create":
             title = request.POST['title']

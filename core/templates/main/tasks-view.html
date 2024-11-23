@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+</head>
+<body>
+    <h1>Your Tasks</h1>
+    
+    <!-- Loop through the tasks and display each one -->
+    <ul>
+        {% for task in tasks %}
+            <li id="task-{{ task.id }}">
+                <strong>{{ task.title }}</strong>: {{ task.description }}
+                
+                <!-- Edit Button -->
+                <button onclick="editTask({{ task.id }}, '{{ task.title }}', '{{ task.description }}')">Edit</button>
+
+                <!-- Delete Button -->
+                <button onclick="deleteTask({{ task.id }})">Delete</button>
+            </li>
+        {% empty %}
+            <p>No tasks found.</p>
+        {% endfor %}
+    </ul>
+
+    <script>
+        // Function to handle the task edit
+        function editTask(taskId, taskTitle, taskDescription) {
+            const newTitle = prompt('Edit task title:', taskTitle);
+            const newDescription = prompt('Edit task description:', taskDescription);
+    
+            if (newTitle && newDescription) {
+                sendTaskEvent('task.edit', taskId, newTitle, newDescription);
+            }
+        }
+    
+        // Function to handle the task delete
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                sendTaskEvent('task.delete', taskId);
+            }
+        }
+    
+        // Function to send the task event (edit or delete) to the backend
+        async function sendTaskEvent(event, taskId, title = '', description = '') {
+            // Create a FormData object
+            const formData = new FormData();
+            formData.append('event', event);
+            formData.append('chat_id', taskId);
+    
+            // If it's an edit event, include the new title and description
+            if (event === 'task.edit') {
+                formData.append('task_title', title);
+                formData.append('task_description', description);
+            }
+    
+            try {
+                const response = await fetch('/task/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
+                    },
+                    body: formData // Send the data as FormData
+                });
+    
+                if (response.ok) {
+                    alert(`${event} successful!`);
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert(`Failed to ${event}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred.');
+            }
+        }
+    </script>
+</body>
+</html>
