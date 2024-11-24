@@ -76,7 +76,6 @@ class TaskManagement(View):
         if request.POST["event"] == "task.create":
             title = request.POST['title']
             description = request.POST['description']
-            print(request.user.pk)
             Tasks.objects.create(
                 user_id = request.user.id,
                 title = title,
